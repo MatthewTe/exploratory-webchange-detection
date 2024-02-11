@@ -12,3 +12,5 @@ export const minioClient = new Minio.Client({
     accessKey: process.env.MINIO_ROOT_USER || "adminroot",
     secretKey: process.env.MINIO_ROOT_PASSWORD || "adminroot"
 })
+
+// https://min.io/docs/minio/linux/developers/javascript/API.html#makeBucket

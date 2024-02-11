@@ -5,7 +5,7 @@ import { minioClient } from "./s3"
 import { IWebsite, ISnapshot, ISnapshotComparison } from "./ingestion_scheduler.types";
 import { PostgresError } from "postgres";
 import cron from 'node-cron';
-import { BucketItemFromList } from "minio";
+import * as webdriver from "selenium-webdriver";
 
 dotenv.config({
     path: "../../deployments/local_envs/local-infra.env"
@@ -131,5 +131,7 @@ app.listen(port, () => {
             })
         }
     })
+
+
 
 });
