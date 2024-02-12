@@ -18,3 +18,8 @@ export interface ISnapshotComparison {
     new_snapshot: string,
     unified_dff: string
 }
+
+export interface ISeleniumContent {
+    htmlContent: string,
+    pageSnapshot: string
+}

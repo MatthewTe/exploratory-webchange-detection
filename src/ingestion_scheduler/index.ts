@@ -2,10 +2,10 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import { sql } from "./db";
 import { minioClient } from "./s3"
-import { IWebsite, ISnapshot, ISnapshotComparison } from "./ingestion_scheduler.types";
+import { IWebsite, ISeleniumContent } from "./ingestion_scheduler.types";
 import { PostgresError } from "postgres";
 import cron from 'node-cron';
-import * as webdriver from "selenium-webdriver";
+import {createTaskFromWebsite} from "./cron_tasks"
 
 dotenv.config({
     path: "../../deployments/local_envs/local-infra.env"
@@ -93,26 +93,6 @@ app.get("/api/tasks", (req: Request, res: Response)=> {
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
     
-    // Creating scheduler:
-    const websites = sql<IWebsite[]>`SELECT * FROM website`.then(results => {
-        if (results.length)
-        {
-            results.forEach(website => {
-                const validCron: boolean = cron.validate(website.archive_period);
-                
-                if (validCron)
-                {
-                    const task = cron.schedule(website.archive_period, () => {
-                        console.log(`This is the scheduled task for website ${website.name}`);
-                    }, {
-                        name: `${website.name} Archive ${website.archive_period}`
-                    })
-                    console.log(`[server]: Added ${website.name} as a scheduled task`);
-                }
-            })
-        }
-    })
-
     // Ensuring the appropriate s3 buckets have been created:
     minioClient.bucketExists("archives", (err, exists: boolean) => {
         if (err) {
@@ -131,6 +111,15 @@ app.listen(port, () => {
             })
         }
     })
+   
+    // Creating scheduler:
+    const websites = sql<IWebsite[]>`SELECT * FROM website`.then(results => {
+        if (results.length)
+        {
+            results.forEach(website => createTaskFromWebsite(website))
+        }
+    })
+
 
 
 
