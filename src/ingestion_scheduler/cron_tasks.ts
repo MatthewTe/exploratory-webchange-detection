@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import { IWebsite, ISeleniumContent } from "./ingestion_scheduler.types";
-import { extractContentSeleniumWebpage } from "./selenium_functions"
+import { extractContentSeleniumWebpage } from "./selenium_functions";
+import { streamHtmlPageToBucket, streamScreenshotPngToBucket } from "./s3";
 
 export function createTaskFromWebsite(website: IWebsite): cron.ScheduledTask | undefined {
 
@@ -14,7 +15,12 @@ export function createTaskFromWebsite(website: IWebsite): cron.ScheduledTask | u
             
             extractContentSeleniumWebpage(website.url, "Hello World")
                 .then((seleniumContent: ISeleniumContent) => {
-                    console.log(`[server]: Finished selenium content extraction for ${website.name}`)
+                    console.log(`[server]: Finished selenium content extraction for ${website.name}. Writing data to bucket`)
+                    
+                    streamHtmlPageToBucket(seleniumContent.htmlContent, website, seleniumContent.extractedDate);
+                    streamScreenshotPngToBucket(seleniumContent.pageSnapshot, website, seleniumContent.extractedDate);
+                    
+                    console.log(`[server]: Successfully wrote ${website.name} data to bucket`)
                 })
         }, {
             name: `${website.name} Archive ${website.archive_period}`

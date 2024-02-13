@@ -19,11 +19,13 @@ export async function extractContentSeleniumWebpage(url: string, seleniumPath: s
 
     const pageSource: string = await driver.getPageSource();
     const pageSnapshot: string = await driver.takeScreenshot();
+    const extractedDate: string = new Date().toJSON()
 
     await driver.quit()
 
     return {
         htmlContent: pageSource,
-        pageSnapshot: pageSnapshot
+        pageSnapshot: pageSnapshot,
+        extractedDate: extractedDate
     }
 }

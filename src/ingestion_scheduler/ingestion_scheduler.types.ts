@@ -21,5 +21,7 @@ export interface ISnapshotComparison {
 
 export interface ISeleniumContent {
     htmlContent: string,
-    pageSnapshot: string
+    pageSnapshot: string,
+    extractedDate: string 
+
 }
