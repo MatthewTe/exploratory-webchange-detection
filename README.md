@@ -39,6 +39,7 @@ export function createTaskFromWebsite(website: IWebsite): cron.ScheduledTask | u
 const task = cron.schedule(website.archive_period, executeTask())
 ```
 
+- Pngs uploaded to blog are not valid. Need to find out [why](https://www.selenium.dev/documentation/webdriver/interactions/windows/#takescreenshot). Something about base64 encoding?
 
 - The two blob functions are not great. Some issues to deal with:
     - They don't return any values despite being async. Should have them return a promise w/ the object id. (These are basic functions we might not even need the abstractions. Could just have the code in the task callback.)
