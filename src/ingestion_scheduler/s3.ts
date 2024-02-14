@@ -14,38 +14,58 @@ const minioClient = new Minio.Client({
     secretKey: process.env.MINIO_ROOT_PASSWORD || "adminroot"
 })
 
-// https://min.io/docs/minio/linux/developers/javascript/API.html#makeBucket
-async function streamHtmlPageToBucket(html: string, website: IWebsite, extractedDate: string) {
+async function streamHtmlPageToBucket(html: string, website: IWebsite, extractedDate: string): Promise<Minio.UploadedObjectInfo | null> {
 
-    console.log(`[server]: Starting to write html page to storage bucket`)
+    console.log(`[server]: Starting to write html page to storage bucket ${website.name}`)
 
-    minioClient.putObject(
-        "archives", 
-        `${website.id}/${extractedDate}/${website.name}_content.html`,
-        html,
-        ((err: any, objInfo: Minio.UploadedObjectInfo) => {
-            if (!err) {
-                console.log(`[server]: Successfully wrote ${website.name} to storage bucket. etag: ${objInfo.etag}`)
-            }
-        })
-    )
-
+    try {
+        minioClient.putObject(
+            "archives", 
+            `${website.id}/${extractedDate}/${website.name}_content.html`,
+            html,
+            ((err: any, objInfo: Minio.UploadedObjectInfo) => {
+                if (!err) {
+                    console.log(`[server]: Successfully wrote ${website.name} to storage bucket. etag: ${objInfo.etag}`)
+                    return objInfo
+                } else {
+                    console.log(`[server]: Error in inserting html page into storage bucket ${err.message}`)
+                    return err
+                }
+            })
+        )
+    } catch (err: any) {
+        console.log(`Uncaught error in minio html ingestion ${err.message}`)
+        return null
+    }
+    return null
 }
 
-async function streamScreenshotPngToBucket(png: string, website: IWebsite, extractedDate: string) {
-    console.log(`[server]: Starting to write page screenshot to storage bucket`)
+async function streamScreenshotPngToBucket(png: string, website: IWebsite, extractedDate: string): Promise<Minio.UploadedObjectInfo | null> {
+    
+    console.log(`[server]: Starting to write page screenshot to storage bucket ${website.name}`)
 
-    minioClient.putObject(
-        "archives", 
-        `${website.id}/${extractedDate}/${website.name}_screenshot.png`,
-        png,
-        ((err: any, objInfo: Minio.UploadedObjectInfo) => {
-            if (!err) {
-                console.log(`[server]: Successfully wrote ${website.name} to storage bucket. etag: ${objInfo.etag}`)
-            }
-        })
-    )
+    try {
+        const pngBuffer = Buffer.from(png, 'base64');
 
+        minioClient.putObject(
+            "archives", 
+            `${website.id}/${extractedDate}/${website.name}_screenshot.png`,
+            pngBuffer,
+            ((err: any, objInfo: Minio.UploadedObjectInfo) => {
+                if (!err) {
+                    console.log(`[server]: Successfully wrote ${website.name} to storage bucket. etag: ${objInfo.etag}`)
+                    return objInfo
+                } else {
+                    console.log(`[server]: Error in inserting snapshot png to storage bucket ${err.message}`)
+                    return err
+                }
+            })
+        )
+    } catch (err: any) {
+        console.log(`Uncaught error in minio html ingestion ${err.message}`)
+        return null
+    }
+    return null
 }
 
 

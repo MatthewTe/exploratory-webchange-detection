@@ -5,7 +5,7 @@ import { minioClient } from "./s3"
 import { IWebsite, ISeleniumContent } from "./ingestion_scheduler.types";
 import { PostgresError } from "postgres";
 import cron from 'node-cron';
-import {createTaskFromWebsite} from "./cron_tasks"
+import {executePageArchivingTask} from "./cron_tasks"
 
 dotenv.config({
     path: "../../deployments/local_envs/local-infra.env"
@@ -79,7 +79,7 @@ app.post("/api/website/", (req: Request, res: Response) => {
     }
 })
 
-app.get("/api/tasks", (req: Request, res: Response)=> {
+app.get("/api/tasks", (req: Request, res: Response) => {
 
     const tasks: Map<string, cron.ScheduledTask> = cron.getTasks();
     const taskNames: string[] = []
@@ -88,6 +88,10 @@ app.get("/api/tasks", (req: Request, res: Response)=> {
     }
 
     res.status(200).json(taskNames)
+})
+
+app.delete("/api/task", (req: Request, res: Response) => {
+    return res.json({"message": "Hello World"})
 })
 
 app.listen(port, () => {
@@ -116,11 +120,19 @@ app.listen(port, () => {
     const websites = sql<IWebsite[]>`SELECT * FROM website`.then(results => {
         if (results.length)
         {
-            results.forEach(website => createTaskFromWebsite(website))
+            results.forEach(website => {
+
+                const validCron: boolean = cron.validate(website.archive_period);
+                    
+                if (validCron)
+                {
+                    const task = cron.schedule(website.archive_period, () => executePageArchivingTask(website), {
+                        name: `${website.name} Archive ${website.archive_period}`
+                    })
+                    console.log(`[server]: Added ${website.name} as a scheduled task with period ${website.archive_period}`);
+                }
+            })
         }
     })
-
-
-
 
 });
