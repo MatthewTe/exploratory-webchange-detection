@@ -5,6 +5,8 @@
 
 ### TODO:
 
+- I added error catching for `streamHtmlPageToBucket` and `streamScreenshotPngToBucket` functions to only execute the postgres insert query for the snapshot table if both async functions execute correctly. Look at if this pattern makes sense. I hate it, it looks so ugly. Clean up the error catching or shift it to using async instead of .then to make catching unexepcted errors easier without compromising error handeling.
+
 - Add SQL logic that will insert an archived record to the postgres database. The Archive `snapshot` postgres column
 
 - Add new SQL functions that deal with ingesting and querying down the rows from db;

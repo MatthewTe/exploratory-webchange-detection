@@ -14,3 +14,6 @@ export const sql = postgres({
     password: process.env.POSTGRES_PASSWORD || "admin"
 })
 
+function insertSnapshotRecord(sql: postgres.Sql, extractedDate: string, staticDirRoot: string, website: string) {
+
+}
