@@ -38,8 +38,7 @@ ALTER TABLE "snapshot" ADD CONSTRAINT "snapshot_parent_website" FOREIGN KEY ("id
 ```
 
 ### TODO:
-- Add new SQL functions that deal with ingesting and querying down the rows from db;
 
-- Add the REST API to add or remove tasks. Already have a list function. Need logic to remove one if provided. And logic to restart a task too (delete a task and then pull the same one from the db)
+- Add Error catching for the tasks reset api
 
 - Add A looging middleware now before complexity spirals out of control

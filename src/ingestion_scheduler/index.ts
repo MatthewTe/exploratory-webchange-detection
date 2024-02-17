@@ -90,8 +90,54 @@ app.get("/api/tasks", (req: Request, res: Response) => {
     res.status(200).json(taskNames)
 })
 
-app.delete("/api/task", (req: Request, res: Response) => {
-    return res.json({"message": "Hello World"})
+app.post("/api/tasks/reset/", (req: Request, res: Response) => {
+    
+    // Original Tasks:
+    const originalTasks: Map<string, cron.ScheduledTask> = cron.getTasks();
+    const originalNames: string[] = []
+    for (let [name, task] of originalTasks) {
+        originalNames.push(name)
+    }
+    
+    console.log(`[server]: Resetting the tasks`)
+    originalTasks.forEach((task, key) => {
+        console.log(`[server]: Removing task ${key}`)
+        task.stop()
+    })
+
+    console.log(`[server]: Getting the new task list from the database`)
+    const websites = sql<IWebsite[]>`SELECT * FROM website`.then(results => {
+        if (results.length)
+        {
+            results.forEach(website => {
+
+                const validCron: boolean = cron.validate(website.archive_period);
+                    
+                if (validCron)
+                {
+                    const task = cron.schedule(website.archive_period, () => executePageArchivingTask(website), {
+                        name: `${website.name} Archive ${website.archive_period}`
+                    })
+                    console.log(`[server]: Added ${website.name} as a scheduled task with period ${website.archive_period}`);
+                }
+            })
+
+            // New Tasks:
+            const newTasks: Map<string, cron.ScheduledTask> = cron.getTasks();
+            const newNames: string[] = []
+            for (let [name, task] of newTasks) {
+                newNames.push(name)
+            }
+            console.log(`[server]: New tasks created.`)
+
+            res.status(201).json({
+                "previous_tasks": originalNames,
+                "new_tasks": newNames
+            })
+        }
+    })
+
+
 })
 
 app.listen(port, () => {
