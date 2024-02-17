@@ -19,11 +19,11 @@ CREATE TABLE "snapshot" (
   "id" uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   "extracted_dt" TIMESTAMP,
   "static_dir_root" VARCHAR,
-  "website" uuid
+  "website" uuid REFERENCES "website" ("id")
 );
 
-ALTER TABLE "snapshot" ADD CONSTRAINT "snapshot_parent_website" FOREIGN KEY ("id") REFERENCES "website" ("id");
+-- ALTER TABLE "snapshot" ADD CONSTRAINT "snapshot_parent_website" FOREIGN KEY ("id") REFERENCES "website" ("id");
 
-ALTER TABLE "snapshot" ADD FOREIGN KEY ("id") REFERENCES "comparison" ("source_snapshot");
+-- ALTER TABLE "snapshot" ADD FOREIGN KEY ("id") REFERENCES "comparison" ("source_snapshot");
 
-ALTER TABLE "snapshot" ADD FOREIGN KEY ("id") REFERENCES "comparison" ("new_snapshot");
+-- ALTER TABLE "snapshot" ADD FOREIGN KEY ("id") REFERENCES "comparison" ("new_snapshot");

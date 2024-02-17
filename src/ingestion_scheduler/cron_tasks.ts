@@ -1,8 +1,8 @@
 import * as Minio from 'minio'
-import { IWebsite, ISeleniumContent } from "./ingestion_scheduler.types";
+import { IWebsite, ISeleniumContent, ISnapshot } from "./ingestion_scheduler.types";
 import { extractContentSeleniumWebpage } from "./selenium_functions";
 import { streamHtmlPageToBucket, streamScreenshotPngToBucket } from "./s3";
-import { request } from 'express';
+import { sql } from './db'
 
 export function executePageArchivingTask(website: IWebsite) {
 
@@ -12,14 +12,38 @@ export function executePageArchivingTask(website: IWebsite) {
         .then((seleniumContent: ISeleniumContent) => {
             console.log(`[server]: Finished selenium content extraction for ${website.name}. Writing data to bucket`)
             
-            // S3 ingestion:
+            // S3 ingestion: HTML Page:
             streamHtmlPageToBucket(seleniumContent.htmlContent, website, seleniumContent.extractedDate)
                 .then(result => {
                     if (result) {
+                        // S3 ingestion PNG Screenshot:
                         streamScreenshotPngToBucket(seleniumContent.pageSnapshot, website, seleniumContent.extractedDate)
                             .then(result => {
                                 if (result) {
                                     console.log(`[server]: Inserted screenshot to storage bucket. Inserting record of ingestion to db`)
+                                    
+                                    // Snapshot column database ingestion:
+                                    const newSnapshot: ISnapshot =  {
+                                        extracted_dt: seleniumContent.extractedDate,
+                                        static_dir_root: `${website.id}/${seleniumContent.extractedDate}/`,
+                                        website: sql.typed(website.id, 2950)
+                                    }
+                                    
+                                    console.log(website)
+
+                                    const result = sql`INSERT INTO snapshot ${sql(newSnapshot, 'extracted_dt', 'static_dir_root', 'website')} RETURNING *`
+                                        .then(results => {
+                                            if (results.length)
+                                            {
+                                                console.log(`[server]: Sucessfully inserted new snapshot into snapshot table: ${results}`)
+                                            } else {
+                                                console.log(`[server]: Error in inserting new snapshot into database. Result returned empty for ingestion ${website.name} | ${website.id}`)
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.log(`[server]: Hard error in inserting snapshot into the database table: ${err.message}`)
+                                        })
+
                                 } else {
                                     console.log(`[server]: Error in inserting screenshot to storage bucket. Record insertion into db wil not take place.`)
                                 }

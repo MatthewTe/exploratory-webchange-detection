@@ -1,3 +1,5 @@
+import { Parameter } from "postgres"
+
 export interface IWebsite {
     id: string,
     name: string,
@@ -6,10 +8,10 @@ export interface IWebsite {
 }
 
 export interface ISnapshot {
-    id: string,
-    extracted_dt: Date,
+    id?: string,
+    extracted_dt: string,
     static_dir_root: string,
-    website: string
+    website: string | Parameter<string>
 }
 
 export interface ISnapshotComparison {
@@ -23,5 +25,4 @@ export interface ISeleniumContent {
     htmlContent: string,
     pageSnapshot: string,
     extractedDate: string 
-
 }
