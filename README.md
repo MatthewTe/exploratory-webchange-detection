@@ -39,6 +39,8 @@ ALTER TABLE "snapshot" ADD CONSTRAINT "snapshot_parent_website" FOREIGN KEY ("id
 
 ### TODO:
 
+- Add a GET request that returns all of the avalible snapshots for a website. 
+
 - Add Error catching for the tasks reset api
 
 - Add A looging middleware now before complexity spirals out of control
