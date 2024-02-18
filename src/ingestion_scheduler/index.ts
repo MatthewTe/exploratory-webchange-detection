@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import { sql } from "./db";
 import { minioClient } from "./s3"
-import { IWebsite, ISeleniumContent } from "./ingestion_scheduler.types";
+import { IWebsite, ISeleniumContent, ISnapshot } from "./ingestion_scheduler.types";
 import { PostgresError } from "postgres";
 import cron from 'node-cron';
 import {executePageArchivingTask} from "./cron_tasks"
@@ -41,6 +41,27 @@ app.get("/api/websites", (req: Request, res: Response) => {
     })
     
 });
+
+app.get("/api/website/snapshots/:id", (req: Request<{id: string}>, res: Response) => {
+
+    if (req.params && req.params.id && typeof req.params.id === "string") {
+        const websites = sql<ISnapshot[]>`SELECT * FROM snapshot WHERE website = ${req.params.id} ORDER BY extracted_dt`
+            .then(results => {
+                if (!results.length) {
+                    return res.status(200).json({"message": "No snapshot entries returned from database"})
+                }
+                return res.json(results)
+            })
+            .catch(err => {
+                if (err instanceof PostgresError)
+                {
+                    return res.status(400).json({'message':`Database Error: ${err.message}`})
+                } else {
+                    return res.status(400).json({'message':`Non-Database Error: ${err.message}`})
+                }
+            })
+        }
+})
 
 app.post("/api/website/", (req: Request, res: Response) => {
     try
