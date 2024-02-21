@@ -38,6 +38,7 @@ ALTER TABLE "snapshot" ADD CONSTRAINT "snapshot_parent_website" FOREIGN KEY ("id
 ```
 
 ### TODO:
+- Build API in C++ that creates the diffs between two archives based on the creation of the comparison
+- Add logic to strip the html content from the html page to store the sturcture of the page.
 - Add Error catching for the tasks reset api
-
 - Add A looging middleware now before complexity spirals out of control

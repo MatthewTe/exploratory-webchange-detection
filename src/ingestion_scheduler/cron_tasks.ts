@@ -2,6 +2,7 @@ import * as Minio from 'minio'
 import { IWebsite, ISeleniumContent, ISnapshot } from "./ingestion_scheduler.types";
 import { extractContentSeleniumWebpage } from "./selenium_functions";
 import { streamHtmlPageToBucket, streamScreenshotPngToBucket } from "./s3";
+import { performFileComparison } from './file_cmp'
 import { sql } from './db'
 
 export function executePageArchivingTask(website: IWebsite) {
@@ -36,6 +37,12 @@ export function executePageArchivingTask(website: IWebsite) {
                                             if (results.length)
                                             {
                                                 console.log(`[server]: Sucessfully inserted new snapshot into snapshot table: ${results}`)
+
+                                                // Performing Comparison:
+                                                let insertedSnapshot = (results[0] as ISnapshot)
+
+                                                performFileComparison(insertedSnapshot, website)
+
                                             } else {
                                                 console.log(`[server]: Error in inserting new snapshot into database. Result returned empty for ingestion ${website.name} | ${website.id}`)
                                             }
