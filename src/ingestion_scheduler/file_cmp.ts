@@ -5,6 +5,7 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs';
 import { exec } from 'child_process';
 import cheerio, { Cheerio, load } from "cheerio";
+import axios from "axios";
 
 function stripContentFromHtml(html: string): string {
     const dom = new JSDOM(html);
@@ -18,21 +19,30 @@ function stripContentFromHtml(html: string): string {
 
 }
 
-export function performFileComparison(newestSnapshot: ISnapshot, website: IWebsite) {
+export function performFileComparison(currentSnapshot: ISnapshot, website: IWebsite) {
     
     // Querying the previous snapshot that is previous to the website:
-    if (newestSnapshot.id) {
+    if (currentSnapshot.id) {
         const result = sql<ISnapshot[]>`
             SELECT * 
             FROM snapshot
-            WHERE extracted_dt < (SELECT extracted_dt FROM snapshot WHERE id = ${newestSnapshot.id})
-            AND website = ${newestSnapshot.website}
+            WHERE extracted_dt < (SELECT extracted_dt FROM snapshot WHERE id = ${currentSnapshot.id})
+            AND website = ${currentSnapshot.website}
             ORDER BY extracted_dt DESC
             LIMIT 1
         `.then(results => {
             if (results.length && results.length < 2) {
 
                 const previousSnapshot = results[0]
+                
+                axios.post("http://127.0.0.1:8000/comparison/", {
+                    websiteName: website.name,
+                    currentSnapshot: currentSnapshot,
+                    previousSnapshot: previousSnapshot
+                })
+                .then(response => {console.log(response)})
+                .catch((err) => console.log(err))
+                
 
                 // Now grab the two files from the storage bucket:
                 let newestHtmlFileChunk: Uint8Array[] = []
@@ -40,8 +50,10 @@ export function performFileComparison(newestSnapshot: ISnapshot, website: IWebsi
                 let previousHtmlFileChunk: Uint8Array[] = []
                 let previousStrippedHtmlContent: string
                 
+                /*
                 console.log("Current bucket storage")
                 const chunks: Uint8Array[] = []
+
                 minioClient.getObject("archives", `${newestSnapshot.static_dir_root}${website.name}_content.html`, 
                     (err, dataStream) => {
                         if (err) {
@@ -117,7 +129,7 @@ export function performFileComparison(newestSnapshot: ISnapshot, website: IWebsi
                             console.error("Error reading data stream:", err);
                         });
                 })
-
+                // https://github.com/steveukx/git-js#how-to-specify-options
                 exec(
                     '/usr/bin/git diff --no-index temp/newestStrippedHtmlFile.html temp/prevStrippedHtmlFile.html', 
                     (err, stdout, stderr) => {
@@ -133,7 +145,7 @@ export function performFileComparison(newestSnapshot: ISnapshot, website: IWebsi
                     }
                 )
 
-
+            */
             }
         })
     }

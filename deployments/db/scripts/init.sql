@@ -4,9 +4,10 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE "comparison" (
   "id" uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  "source_snapshot" uuid UNIQUE,
+  "prev_snapshot" uuid UNIQUE,
   "new_snapshot" uuid UNIQUE,
-  "unified_diff" text
+  "unified_diff" text,
+  "created_on" TIMESTAMP
 );
 
 CREATE TABLE "website" (
