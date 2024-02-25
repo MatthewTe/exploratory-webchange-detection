@@ -16,9 +16,10 @@ export interface ISnapshot {
 
 export interface ISnapshotComparison {
     id: string,
-    source_snapshot: string,
+    prev_snapshot: string,
     new_snapshot: string,
-    unified_dff: string
+    unified_dff: string,
+    created_on: string
 }
 
 export interface ISeleniumContent {

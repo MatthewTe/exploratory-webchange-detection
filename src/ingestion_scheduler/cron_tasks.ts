@@ -40,7 +40,6 @@ export function executePageArchivingTask(website: IWebsite) {
 
                                                 // Performing Comparison:
                                                 let insertedSnapshot = (results[0] as ISnapshot)
-
                                                 performFileComparison(insertedSnapshot, website)
 
                                             } else {
