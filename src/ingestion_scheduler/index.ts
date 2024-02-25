@@ -6,6 +6,7 @@ import { IWebsite, ISeleniumContent, ISnapshot } from "./ingestion_scheduler.typ
 import { PostgresError } from "postgres";
 import cron from 'node-cron';
 import {executePageArchivingTask} from "./cron_tasks"
+import {logger} from "./logger";
 
 dotenv.config({
     path: "../../deployments/local_envs/local-infra.env"
@@ -120,13 +121,13 @@ app.post("/api/tasks/reset/", (req: Request, res: Response) => {
         originalNames.push(name)
     }
     
-    console.log(`[server]: Resetting the tasks`)
+    logger.info(`[server]: Resetting the tasks`)
     originalTasks.forEach((task, key) => {
-        console.log(`[server]: Removing task ${key}`)
+        logger.info(`[server]: Removing task ${key}`)
         task.stop()
     })
 
-    console.log(`[server]: Getting the new task list from the database`)
+    logger.info(`[server]: Getting the new task list from the database`)
     const websites = sql<IWebsite[]>`SELECT * FROM website`.then(results => {
         if (results.length)
         {
@@ -139,7 +140,7 @@ app.post("/api/tasks/reset/", (req: Request, res: Response) => {
                     const task = cron.schedule(website.archive_period, () => executePageArchivingTask(website), {
                         name: `${website.name} Archive ${website.archive_period}`
                     })
-                    console.log(`[server]: Added ${website.name} as a scheduled task with period ${website.archive_period}`);
+                    logger.info(`[server]: Added ${website.name} as a scheduled task with period ${website.archive_period}`);
                 }
             })
 
@@ -149,7 +150,7 @@ app.post("/api/tasks/reset/", (req: Request, res: Response) => {
             for (let [name, task] of newTasks) {
                 newNames.push(name)
             }
-            console.log(`[server]: New tasks created.`)
+            logger.info(`[server]: New tasks created.`)
 
             res.status(201).json({
                 "previous_tasks": originalNames,
@@ -162,22 +163,22 @@ app.post("/api/tasks/reset/", (req: Request, res: Response) => {
 })
 
 app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
+    logger.info(`[server]: Server is running at http://localhost:${port}`);
     
     // Ensuring the appropriate s3 buckets have been created:
     minioClient.bucketExists("archives", (err, exists: boolean) => {
         if (err) {
-            console.log(`[server]: Error in determining if bucket archives exists ${err.message}`)
+            logger.error(`[server]: Error in determining if bucket archives exists ${err.message}`)
         }
         if (exists) {
-            console.log(`[server]: Archive bucket already exists`)
+            logger.info(`[server]: Archive bucket already exists`)
         } else {
             minioClient.makeBucket("archives", (err) => {
                 if (err) {
-                    console.log(`[server]: Error in creating archives bucket`, err)
+                    logger.error(`[server]: Error in creating archives bucket`, err)
                 } 
                 else {
-                    console.log(`[server]: Sucessfully created bucket 'archives'`)
+                    logger.info(`[server]: Sucessfully created bucket 'archives'`)
                 }
             })
         }
@@ -196,7 +197,7 @@ app.listen(port, () => {
                     const task = cron.schedule(website.archive_period, () => executePageArchivingTask(website), {
                         name: `${website.name} Archive ${website.archive_period}`
                     })
-                    console.log(`[server]: Added ${website.name} as a scheduled task with period ${website.archive_period}`);
+                    logger.info(`[server]: Added ${website.name} as a scheduled task with period ${website.archive_period}`);
                 }
             })
         }
