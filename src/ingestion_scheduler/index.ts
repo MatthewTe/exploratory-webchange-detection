@@ -64,6 +64,8 @@ app.get("/api/website/snapshots/:id", (req: Request<{id: string}>, res: Response
         }
 })
 
+// TODO: Build the GET request api for the comparisons table in the database.
+
 app.post("/api/website/", (req: Request, res: Response) => {
     try
     {
