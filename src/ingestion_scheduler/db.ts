@@ -1,13 +1,8 @@
 import postgres from 'postgres';
 import dotenv from "dotenv";
 
-dotenv.config({
-    path: "../../deployments/local_envs/local-infra.env"
-});
-
-
 export const sql = postgres({
-    host: "localhost",
+    host: "local-postgres-db",
     port: 5432,
     database: "postgres",
     username: process.env.POSTGRES_USER || "admin",

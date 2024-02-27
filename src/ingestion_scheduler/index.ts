@@ -8,9 +8,6 @@ import cron from 'node-cron';
 import {executePageArchivingTask} from "./cron_tasks"
 import {logger} from "./logger";
 
-dotenv.config({
-    path: "../../deployments/local_envs/local-infra.env"
-});
 
 const app: Express = express();
 app.use(express.json())
@@ -18,7 +15,7 @@ app.use(express.json())
 const port = process.env.PORT || 3001;
 
 app.get("/", (req: Request, res: Response) => {
-    res.send("Express + TypeScript Server");
+    res.send("Hello Wolrd");
 });
 
 app.get("/api/websites", (req: Request, res: Response) => { 
@@ -168,6 +165,7 @@ app.listen(port, () => {
     logger.info(`[server]: Server is running at http://localhost:${port}`);
     
     // Ensuring the appropriate s3 buckets have been created:
+
     minioClient.bucketExists("archives", (err, exists: boolean) => {
         if (err) {
             logger.error(`[server]: Error in determining if bucket archives exists ${err.message}`)

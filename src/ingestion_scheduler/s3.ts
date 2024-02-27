@@ -3,13 +3,8 @@ import dotenv from "dotenv";
 import { IWebsite } from "./ingestion_scheduler.types";
 import {logger} from "./logger";
 
-
-dotenv.config({
-    path: "../../deployments/local_envs/local-infra.env"
-});
-
 const minioClient = new Minio.Client({
-    endPoint: 'localhost',
+    endPoint: 'local-minio',
     port: 9000,
     useSSL: false,
     accessKey: process.env.MINIO_ROOT_USER || "adminroot",
