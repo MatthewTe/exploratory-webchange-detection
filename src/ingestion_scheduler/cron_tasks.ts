@@ -10,7 +10,7 @@ export function executePageArchivingTask(website: IWebsite) {
 
     logger.info(`[server]: Executing selenium content extraction for ${website.name}`)
     
-    extractContentSeleniumWebpage(website.url, "Hello World")
+    extractContentSeleniumWebpage(website.url, "./selenium/chromedriver")
         .then((seleniumContent: ISeleniumContent) => {
             logger.info(`[server]: Finished selenium content extraction for ${website.name}. Writing data to bucket`)
             
@@ -65,5 +65,7 @@ export function executePageArchivingTask(website: IWebsite) {
             
 
             logger.info(`[server]: Successfully wrote ${website.name} data to bucket`)
-    })
+        }).catch(err => {
+            logger.error(`[server]: Error in extracting the selenium content ${err.stack}`)
+        })
 }

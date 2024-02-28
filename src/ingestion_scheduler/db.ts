@@ -2,7 +2,7 @@ import postgres from 'postgres';
 import dotenv from "dotenv";
 
 export const sql = postgres({
-    host: "local-postgres-db",
+    host: "localhost",
     port: 5432,
     database: "postgres",
     username: process.env.POSTGRES_USER || "admin",

@@ -4,7 +4,7 @@ import { IWebsite } from "./ingestion_scheduler.types";
 import {logger} from "./logger";
 
 const minioClient = new Minio.Client({
-    endPoint: 'local-minio',
+    endPoint: 'localhost',
     port: 9000,
     useSSL: false,
     accessKey: process.env.MINIO_ROOT_USER || "adminroot",
