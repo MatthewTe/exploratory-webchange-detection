@@ -1,28 +1,55 @@
 {
 
   "scripts": {
+
     "build": "npx tsc",
+
     "start": "npx tsc && node build/index.js",
+
     "dev": "nodemon --exec 'npm run build && node build/index.js'"
+
   },
+
   "nodemonConfig": {
+
     "restartable": "rs",
+
     "ignore": [
+
       ".git",
+
       "node_modules/**/node_modules",
+
       "*.log"
+
     ],
+
     "verbose": true,
+
     "execMap": {
+
       "ts": "node --loader ts-node/esm"
+
     },
-    "watch": ["*.ts"],
+
+    "watch": [
+
+      "*.ts"
+
+    ],
+
     "ext": "ts,json",
+
     "env": {
+
       "NODE_ENV": "development"
+
     },
+
     "script": "npm run dev"
+
   },
+
   "devDependencies": {
 
     "@types/express": "^4.17.21",

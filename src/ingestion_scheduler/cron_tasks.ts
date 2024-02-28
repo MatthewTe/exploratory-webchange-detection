@@ -48,20 +48,20 @@ export function executePageArchivingTask(website: IWebsite) {
                                             }
                                         })
                                         .catch(err => {
-                                            logger.error(`[server]: Hard error in inserting snapshot into the database table: ${err.message}`)
+                                            logger.error(`[server]: Hard error in inserting snapshot into the database table: ${err.message}. ${err.stack}`)
                                         })
 
                                 } else {
                                     logger.error(`[server]: Error in inserting screenshot to storage bucket. Record insertion into db wil not take place.`)
                                 }
                             })
-                            .catch(err => logger.error(`[server]: Serious error in screenshot bucket ignestion ${err.message}`))
+                            .catch(err => logger.error(`[server]: Serious error in screenshot bucket ignestion ${err.message} ${err.stack}`))
 
                     } else {
                         logger.error(`[server]: Error in inserting html page to storage bucket. Screenshot ingestion was not attempted`)
                     }
                 })
-                .catch(err => logger.error(`[server]: Serious error in html bucket ignestion ${err.message}`))
+                .catch(err => logger.error(`[server]: Serious error in html bucket ignestion ${err.message} ${err.stack}`))
             
 
             logger.info(`[server]: Successfully wrote ${website.name} data to bucket`)

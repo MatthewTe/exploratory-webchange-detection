@@ -5,9 +5,14 @@ import { ISeleniumContent } from "./ingestion_scheduler.types";
 export async function extractContentSeleniumWebpage(url: string, seleniumPath: string): Promise<ISeleniumContent>  {
 
     // Config the webdriver pointing to a custom driver on fs:
-    const chromeOptions = new Options().setChromeBinaryPath(seleniumPath);
+    const chromeOptions = new Options();
+    //chromeOptions.addArguments('--no-sandbox');
+    //chromeOptions.addArguments('--headless');
+    //chromeOptions.addArguments('--disable-dev-shm-usage');
+
     const driver: webdriver.WebDriver = await new webdriver.Builder()
         .forBrowser("chrome")
+        .setChromeOptions(chromeOptions)
         .build();
 
     await driver.get(url);

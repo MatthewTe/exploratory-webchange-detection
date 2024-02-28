@@ -27,20 +27,20 @@ services:
       - minio_storage:/local_minio_data
     command: server --console-address ":9001" /local_minio_data
 
-  scheduler_api:
-    build:
-      context: ../src/ingestion_scheduler
-    container_name: scheduler_api
-    restart: always
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-    volumes:
-      - ../src/ingestion_scheduler:/usr/src/app
-    ports:
-      - "3001:3001"
+##scheduler_api:
+##  build:
+##    context: ../src/ingestion_scheduler
+##  container_name: scheduler_api
+##  restart: always
+##  environment:
+##    - POSTGRES_USER=${POSTGRES_USER}
+##    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+##    - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+##    - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+##  volumes:
+##    - ../src/ingestion_scheduler:/usr/src/app
+##  ports:
+##    - "3001:3001"
 
   unified_diff_api:
     build:
