@@ -16,7 +16,7 @@ export function executePageArchivingTask(website: IWebsite) {
             
             // S3 ingestion: HTML Page:
             streamHtmlPageToBucket(seleniumContent.htmlContent, website, seleniumContent.extractedDate)
-                .then(result => {
+                            .then(result => {
                     if (result) {
                         // S3 ingestion PNG Screenshot:
                         streamScreenshotPngToBucket(seleniumContent.pageSnapshot, website, seleniumContent.extractedDate)
@@ -62,7 +62,7 @@ export function executePageArchivingTask(website: IWebsite) {
                     }
                 })
                 .catch(err => logger.error(`[server]: Serious error in html bucket ignestion ${err.message} ${err.stack}`))
-            
+
 
             logger.info(`[server]: Successfully wrote ${website.name} data to bucket`)
         }).catch(err => {
