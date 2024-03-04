@@ -3,10 +3,15 @@ import postgres from 'postgres'
 
 /** @import {ISnapshot} from '$lib/types.js' */
 
-export async function GET({ params }) {
+export async function GET({ url }) {
     
     // TODO: Add query params to this to filter which snapshots gets pulled down.
-    console.log(params)
+    // Website, limit...
+    // Url params:
+    const website = url.searchParams.get("website" ?? null);
+    const skip = url.searchParams.get("skip" ?? 0);
+    const limit = url.searchParams.get("limit" ?? 100);
+
     const sql = postgres({
         host: SECRET_POSTGRES_HOST,
         port:5432,
@@ -15,10 +20,29 @@ export async function GET({ params }) {
         password: SECRET_POSTGRES_PASSWORD
     })
 
-    try {
-        /** @type {ISnapshot[]} */
-        const snapshots = await sql`SELECT * FROM public.snapshot ORDER BY extracted_dt`
+    console.log(website);
 
+    try {
+
+        /** @type {ISnapshot[]} */
+        let snapshots
+        if (!website) {
+            snapshots = await sql`
+                SELECT * FROM public.snapshot 
+                ORDER BY extracted_dt
+                LIMIT ${limit}
+                OFFSET ${skip}
+            `
+        } else {
+            snapshots = await sql`
+                SELECT * FROM public.snapshot 
+                WHERE website = ${website} 
+                ORDER BY extracted_dt 
+                LIMIT ${limit}
+                OFFSET ${skip}
+                `
+        }
+        
         return new Response(JSON.stringify(snapshots), {
             headers: {
                 "Content-Type": "application/json"
