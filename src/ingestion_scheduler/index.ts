@@ -111,7 +111,7 @@ app.get("/api/tasks", (req: Request, res: Response) => {
     res.status(200).json(taskNames)
 })
 
-app.post("/api/tasks/reset/", (req: Request, res: Response) => {
+app.get("/api/tasks/reset/", (req: Request, res: Response) => {
     
     // Original Tasks:
     const originalTasks: Map<string, cron.ScheduledTask> = cron.getTasks();

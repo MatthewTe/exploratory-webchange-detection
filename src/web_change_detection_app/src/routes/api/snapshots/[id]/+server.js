@@ -25,3 +25,27 @@ export async function GET({ params }) {
     }
 }
 
+export async function DELETE({ params }) {
+
+    const sql = postgres({
+        host: SECRET_POSTGRES_HOST,
+        port:5432,
+        database: SECRET_POSTGRES_DATABASE,
+        username: SECRET_POSTGRES_USER,
+        password: SECRET_POSTGRES_PASSWORD
+    })
+
+    try {
+        /** @type {ISnapshot[]} */
+        const deletedSnapshot = await sql`DELETE FROM public.snapshot WHERE id = ${params.id} RETURNING *`
+
+        return new Response(JSON.stringify(deletedSnapshot), {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            status: 200
+        })
+    } catch (err) {
+        return new Response(JSON.stringify(err))
+    }
+}
