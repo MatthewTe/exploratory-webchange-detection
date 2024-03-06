@@ -5,8 +5,6 @@ import postgres from 'postgres'
 
 export async function GET({ url }) {
     
-    // TODO: Add query params to this to filter which snapshots gets pulled down.
-    // Website, limit...
     // Url params:
     const website = url.searchParams.get("website" ?? null);
     const skip = url.searchParams.get("skip" ?? 0);
