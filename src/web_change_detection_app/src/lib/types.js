@@ -17,3 +17,12 @@
  * @property {string} static_dir_root
  * @property {string | Parameter} website
  */
+
+/**
+ * @typedef {Object} ISnapshotComparison
+ * @property {string} id
+ * @property {string} prev_snapshot
+ * @property {string} new_snapshot
+ * @property {string=} [unified_dff]
+ * @property {string} created_on
+ */
